@@ -30,15 +30,30 @@ public class DataProcessorService {
             OutputType outputType,
             List<Integer> data) throws Exception {
 
-        // TODO: implement using the enums only (no long if/else ladders required,
-        // but minimal branching to select behavior by enum is acceptable in this task).
-        // Steps:
-        // 1) Copy & clean data according to cleaningType.
-        // 2) Analyze cleaned array according to analysisType.
-        // 3) Output according to outputType (console or target/result.txt).
-        // 4) Return the numeric result.
+        List<Integer> copy = new ArrayList<>(data);
 
-        throw new UnsupportedOperationException("Student must implement process(...)");
+        org.example.dataprocessor.clean.cleaningType cleaning = switch (cleaningType) {
+            case REMOVE_NEGATIVES -> new org.example.dataprocessor.clean.REMOVE_NEGATIVES();
+            case REPLACE_NEGATIVES_WITH_ZERO -> new org.example.dataprocessor.clean.REPLACE_NEGATIVES_WITH_ZERO();
+        };
+        List<Integer> cleaned = cleaning.clean(copy);
+
+        org.example.dataprocessor.analyze.analysisType analysis = switch (analysisType) {
+            case MEAN -> new org.example.dataprocessor.analyze.MEAN();
+            case MEDIAN -> new org.example.dataprocessor.analyze.MEDIAN();
+            case STD_DEV -> new org.example.dataprocessor.analyze.STD_DEV();
+            case P90_NEAREST_RANK -> new org.example.dataprocessor.analyze.P90_NEAREST_RANK();
+            case TOP3_FREQUENT_COUNT_SUM -> new org.example.dataprocessor.analyze.TOP3_FREQUENT_COUNT_SUM();
+        };
+        double result = analysis.analyze(cleaned);
+
+        org.example.dataprocessor.output.outputType output = switch (outputType) {
+            case CONSOLE -> new org.example.dataprocessor.output.console();
+            case TEXT_FILE -> new org.example.dataprocessor.output.TextFile();
+        };
+        output.output(result);
+
+        return result;
     }
 }
 
